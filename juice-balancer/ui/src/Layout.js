@@ -6,7 +6,7 @@ import logo from './logo.svg';
 import { Card, H1 } from './Components';
 
 const Header = styled.div`
-  background-color: #cf3a23;
+  background-color: #1976d2;
   min-height: 128px;
   display: flex;
   justify-content: center;
@@ -92,7 +92,7 @@ export function Layout({ children, footer }) {
         <Header>
           <HeaderCard>
             <Logo alt="CTF Logo" />
-            <H1>MultiJuicer</H1>
+            <H1>Presidio MultiJuicer</H1>
           </HeaderCard>
         </Header>
         <Body>

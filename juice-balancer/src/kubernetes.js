@@ -69,6 +69,10 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   name: 'CTF_KEY',
                   value: get('juiceShop.ctfKey'),
                 },
+                {
+                  name: 'SIGSCI_SECRETACCESSKEY',
+                  value: get('juiceShop.ctfKey'),
+                },
               ],
               ports: [
                 {
@@ -80,17 +84,20 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   path: '/rest/admin/application-version',
                   port: 3000,
                 },
-                initialDelaySeconds: 5,
-                periodSeconds: 2,
+                initialDelaySeconds: 30,
+                periodSeconds: 5,
                 failureThreshold: 10,
+                timeoutSeconds: 2,
               },
               livenessProbe: {
                 httpGet: {
                   path: '/rest/admin/application-version',
                   port: 3000,
                 },
-                initialDelaySeconds: 30,
+                initialDelaySeconds: 45,
                 periodSeconds: 15,
+                failureThreshold: 3,
+                timeoutSeconds: 2,
               },
               volumeMounts: [
                 {
