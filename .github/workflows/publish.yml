@@ -1,57 +1,31 @@
+name: 'Publish Helm Charts'
 on:
-  release:
-    types: [published]
-name: 'Publish Docker Images'
+  push:
+    branches:
+      - presidio
+
 jobs:
-  helmRelease:
-    name: 'Package Helm Chart'
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: J12934/helm-gh-pages-action@v2.0.0
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
-          charts-folder: helm
-          deploy-branch: gh-pages
-  progressWatchDog:
-    name: ProgressWatchDog
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build'n Push ProgressWatchDog
-        uses: pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.1.0
         env:
-          DOCKER_IMAGE_NAME: juice-progress-watchdog
-          DOCKER_NAMESPACE: iteratec
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          args: ./progress-watchdog/
-  cleaner:
-    name: Cleaner
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build'n Push Cleaner
-        uses: pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9
-        env:
-          DOCKER_IMAGE_NAME: juice-cleaner
-          DOCKER_NAMESPACE: iteratec
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        with:
-          args: ./cleaner/
-  balancer:
-    name: Balancer
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build'n Push Balancer
-        uses: pangzineng/Github-Action-One-Click-Docker@bfb4a810c8cb823f4a87c24da145caa707e297e9
-        env:
-          DOCKER_IMAGE_NAME: juice-balancer
-          DOCKER_NAMESPACE: iteratec
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        with:
-          args: ./juice-balancer/
+          charts_dir: helm/multi-juicer
