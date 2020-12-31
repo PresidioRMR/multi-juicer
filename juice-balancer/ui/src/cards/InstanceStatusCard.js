@@ -83,7 +83,7 @@ export const InstanceStatusCard = ({ teamname }) => {
               />
             </span>
           </CenteredText>
-          <LinkButton data-test-id="start-hacking-button" href="/">
+          <LinkButton data-test-id="start-hacking-button" href="/#/score-board">
             <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
           </LinkButton>
         </BodyCard>
