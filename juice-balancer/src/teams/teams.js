@@ -15,6 +15,7 @@ const {
   createServiceForTeam,
   createPublicServiceForTeam,
   getJuiceShopInstanceForTeamname,
+  getJuiceShopIPForTeamname,
   getJuiceShopInstances,
   changePasscodeHashForTeam,
 } = require('../kubernetes');
@@ -170,16 +171,19 @@ async function createTeam(req, res) {
   try {
     const { passcode, hash } = await generatePasscode();
 
-    logger.info(`Creating JuiceShop Deployment for team "${team}"`);
+    logger.info(`Creating JuiceShop Deployment for team ${team}`);
 
     await createDeploymentForTeam({ team, passcodeHash: hash });
-    await createServiceForTeam(team);
-    if(get('createTeamIPs')) {
+    if (get('createTeamIPs')) {
       await createPublicServiceForTeam(team);
-      logger.info(`Created Public IP for team "${team}"`);
+      logger.info(`Created Public Service for team ${team}`);
+    }
+    else{
+      await createServiceForTeam(team);
+      logger.info(`Created Service for team "${team}"`);
     }
 
-    logger.info(`Created JuiceShop Deployment for team "${team}"`);
+    logger.info(`Created JuiceShop Deployment for team ${team}`);
 
     loginCounter.inc({ type: 'registration', userType: 'user' }, 1);
 
@@ -251,8 +255,20 @@ async function awaitReadiness(req, res) {
 
       if (readyReplicas === 1) {
         logger.info(`JuiceShop Deployment for team "${team}" ready`);
-
-        return res.status(200).send();
+        if(get('createTeamIPs')) {
+          const { ip } = await getJuiceShopIPForTeamname(team);
+          if(ip != undefined)
+          {
+            logger.info(`JuiceShop IP for team ${team}: ${ip}`);
+            return res.status(200).send(ip);
+          }
+          else {
+            logger.info(`No IP for team ${team} yet`);
+          }
+        }
+        else{
+          return res.status(200).send();
+        }
       }
 
       await sleep(1000);

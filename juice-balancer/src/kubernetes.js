@@ -6,6 +6,7 @@ const k8sAppsApi = kc.makeApiClient(AppsV1Api);
 const k8sCoreApi = kc.makeApiClient(CoreV1Api);
 
 const { get } = require('./config');
+const { logger } = require('./logger');
 
 const lodashGet = require('lodash/get');
 const once = require('lodash/once');
@@ -168,7 +169,7 @@ const createPublicServiceForTeam = async (teamname) =>
   k8sCoreApi
     .createNamespacedService(get('namespace'), {
       metadata: {
-        name: `t-${teamname}-juiceshop-pub-ip`,
+        name: `t-${teamname}-juiceshop`,
         labels: {
           app: 'juice-shop',
           team: teamname,
@@ -185,8 +186,7 @@ const createPublicServiceForTeam = async (teamname) =>
         },
         ports: [
           {
-            port: 4000,
-            targetPort: 3000,
+            port: 3000
           },
         ],
       },
@@ -283,6 +283,27 @@ const getJuiceShopInstanceForTeamname = (teamname) =>
       throw new Error(error.response.body.message);
     });
 module.exports.getJuiceShopInstanceForTeamname = getJuiceShopInstanceForTeamname;
+
+const getJuiceShopIPForTeamname = (teamname) =>
+  k8sCoreApi
+    .readNamespacedService(`t-${teamname}-juiceshop`, get('namespace'))
+    .then((res) => {
+      var ip = undefined;
+      try{
+        ip = res.body.status.loadBalancer.ingress[0].ip;
+      }
+      catch{
+        return undefined;
+      }
+      return {
+        ip: ip
+      };
+    })
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+module.exports.getJuiceShopIPForTeamname = getJuiceShopIPForTeamname;
+
 
 const updateLastRequestTimestampForTeam = (teamname) => {
   const headers = { 'content-type': 'application/strategic-merge-patch+json' };

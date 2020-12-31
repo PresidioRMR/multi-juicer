@@ -25,6 +25,7 @@ const timedOut = Symbol('TIMED_OUT');
 
 export const InstanceStatusCard = ({ teamname }) => {
   const [instanceStatus, setInstanceStatus] = useState(waiting);
+  const [ip, setIP] = useState('');
 
   useEffect(() => {
     promiseRetry(
@@ -38,6 +39,13 @@ export const InstanceStatusCard = ({ teamname }) => {
           .get(`/balancer/teams/${teamname}/wait-till-ready`, {
             // Wait at most 3 minutes before timing out
             timeout: 3 * 60 * 1000,
+          })
+          .then(res => {
+            console.log('res:');
+            console.log(res);
+            console.log('Intsance IP:');
+            console.log(res.data);
+            setIP(res.data);
           })
           .catch(retry);
       },
@@ -70,24 +78,48 @@ export const InstanceStatusCard = ({ teamname }) => {
         </CenteredCard>
       );
     case ready:
-      return (
-        <BodyCard>
-          <CenteredText>
-            <span role="img" aria-label="Done">
-              ✅
-            </span>{' '}
-            <span data-test-id="instance-status">
-              <FormattedMessage
-                id="instance_status_ready"
-                defaultMessage="Juice Shop Instance Ready"
-              />
-            </span>
-          </CenteredText>
-          <LinkButton data-test-id="start-hacking-button" href="/#/score-board">
-            <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
-          </LinkButton>
-        </BodyCard>
-      );
+      if(ip != ''){
+        return (
+          <BodyCard>
+            <CenteredText>
+              <span role="img" aria-label="Done">
+                ✅
+              </span>{' '}
+              <span data-test-id="instance-status">
+                <FormattedMessage
+                  id="instance_status_ready"
+                  defaultMessage="Juice Shop Instance Ready"
+                />
+              </span>
+              <span> IP: {ip}</span>
+            </CenteredText>
+            <LinkButton data-test-id="start-hacking-button" href={'http://'+ip+':3000/#/score-board'}>
+              <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
+            </LinkButton>
+          </BodyCard>
+        );
+      }
+      else{
+
+        return (
+          <BodyCard>
+            <CenteredText>
+              <span role="img" aria-label="Done">
+                ✅
+              </span>{' '}
+              <span data-test-id="instance-status">
+                <FormattedMessage
+                  id="instance_status_ready"
+                  defaultMessage="Juice Shop Instance Ready"
+                />
+              </span>
+            </CenteredText>
+            <LinkButton data-test-id="start-hacking-button" href="/#/score-board">
+              <FormattedMessage id="instance_status_start_hacking" defaultMessage="Start Hacking" />
+            </LinkButton>
+          </BodyCard>
+        );
+      }
     case waitingForLong:
       return (
         <CenteredCard>
