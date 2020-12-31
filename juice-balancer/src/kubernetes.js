@@ -70,8 +70,12 @@ const createDeploymentForTeam = async ({ team, passcodeHash }) => {
                   value: get('juiceShop.ctfKey'),
                 },
                 {
+                  name: 'SIGSCI_ACCESSKEYID',
+                  value: get('juiceShop.sigsciAccessKey'),
+                },
+                {
                   name: 'SIGSCI_SECRETACCESSKEY',
-                  value: get('juiceShop.ctfKey'),
+                  value: get('juiceShop.sigsciSecretAccessKey'),
                 },
               ],
               ports: [

@@ -29,6 +29,8 @@ data:
         "tag": {{ .Values.juiceShop.tag | quote }},
         "imagePullPolicy": {{ .Values.imagePullPolicy | quote }},
         "ctfKey": {{ .Values.juiceShop.ctfKey | quote }},
+        "sigsciAccessKey": {{ .Values.juiceShop.sigsciAccessKey | quote }},
+        "sigsciSecretAccessKey": {{ .Values.juiceShop.sigsciSecretAccessKey | quote }},
         "nodeEnv": {{ .Values.juiceShop.nodeEnv | quote }},
         "resources": {{ .Values.juiceShop.resources | toJson }},
         "securityContext": {{ .Values.juiceShop.securityContext | toJson }}

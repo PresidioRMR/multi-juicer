@@ -30,5 +30,6 @@ spec:
   selector:
     {{- include "multi-juicer.selectorLabels" . | nindent 4 }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.balancer.service.port }}
+      targetPort: {{ .Values.balancer.service.targetPort }}
       name: web
