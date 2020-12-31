@@ -1,4 +1,4 @@
-const { KubeConfig, AppsV1Api, CoreV1Api } = require('@kubernetes/client-node');
+const { KubeConfig, AppsV1Api, CoreV1Api, V1LoadBalancerIngress } = require('@kubernetes/client-node');
 const kc = new KubeConfig();
 kc.loadFromCluster();
 
@@ -163,6 +163,38 @@ const createServiceForTeam = async (teamname) =>
       throw new Error(error.response.body.message);
     });
 module.exports.createServiceForTeam = createServiceForTeam;
+
+const createPublicServiceForTeam = async (teamname) =>
+  k8sCoreApi
+    .createNamespacedService(get('namespace'), {
+      metadata: {
+        name: `t-${teamname}-juiceshop-pub-ip`,
+        labels: {
+          app: 'juice-shop',
+          team: teamname,
+          'deployment-context': get('deploymentContext'),
+        },
+        ...(await getOwnerReference()),
+      },
+      spec: {
+        type: 'LoadBalancer',
+        selector: {
+          app: 'juice-shop',
+          team: teamname,
+          'deployment-context': get('deploymentContext'),
+        },
+        ports: [
+          {
+            port: 4000,
+            targetPort: 3000,
+          },
+        ],
+      },
+    })
+    .catch((error) => {
+      throw new Error(error.response.body.message);
+    });
+module.exports.createPublicServiceForTeam = createPublicServiceForTeam;
 
 async function getOwnerReference() {
   if (get('skipOwnerReference') === true) {

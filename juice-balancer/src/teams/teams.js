@@ -13,6 +13,7 @@ const router = express.Router();
 const {
   createDeploymentForTeam,
   createServiceForTeam,
+  createPublicServiceForTeam,
   getJuiceShopInstanceForTeamname,
   getJuiceShopInstances,
   changePasscodeHashForTeam,
@@ -173,6 +174,10 @@ async function createTeam(req, res) {
 
     await createDeploymentForTeam({ team, passcodeHash: hash });
     await createServiceForTeam(team);
+    if(get('createTeamIPs')) {
+      await createPublicServiceForTeam(team);
+      logger.info(`Created Public IP for team "${team}"`);
+    }
 
     logger.info(`Created JuiceShop Deployment for team "${team}"`);
 

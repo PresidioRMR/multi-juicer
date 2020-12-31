@@ -19,6 +19,7 @@ data:
       "admin": {
         "username": "admin"
       },
+      "createTeamIPs": {{ .Values.balancer.createTeamIPs }},
   {{- if .Values.balancer.metrics.enabled }}
       "metrics": {
         "enabled": true
