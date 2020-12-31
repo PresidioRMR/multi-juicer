@@ -6,25 +6,13 @@ on:
       - presidio
 
 jobs:
-  release:
+  helmRelease:
+    name: 'Package Helm Chart'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v1
+      - uses: actions/checkout@v1
+      - uses: J12934/helm-gh-pages-action@v2.0.0
         with:
-          version: v3.4.0
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@master
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        with:
-          charts_dir: helm/multi-juicer
+          access-token: ${{ secrets.CR_TOKEN }}
+          charts-folder: helm
+          deploy-branch: gh-pages
