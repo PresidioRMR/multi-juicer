@@ -293,7 +293,9 @@ const getJuiceShopIPForTeamname = (teamname) =>
         ip = res.body.status.loadBalancer.ingress[0].ip;
       }
       catch{
-        return undefined;
+        return {
+          ip: undefined
+        }
       }
       return {
         ip: ip
