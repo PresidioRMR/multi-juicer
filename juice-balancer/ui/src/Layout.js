@@ -2,7 +2,7 @@ import React from 'react';
 
 import styled, { createGlobalStyle } from 'styled-components';
 
-import logo from './logo.svg';
+import logo from './presidio_tech_logo.png';
 import { Card, H1 } from './Components';
 
 const Header = styled.div`
@@ -92,7 +92,7 @@ export function Layout({ children, footer }) {
         <Header>
           <HeaderCard>
             <Logo alt="CTF Logo" />
-            <H1>Presidio MultiJuicer</H1>
+            <H1>Presidio Tech Shop Launcher</H1>
           </HeaderCard>
         </Header>
         <Body>
